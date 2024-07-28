@@ -154,7 +154,7 @@
             <box-icon name='notepad' color="#6c757d"></box-icon>
             <h5>History</h5>
         </a>
-        <a href="info.html" class="d-flex text-secondary profile-link">
+        <a href="info.html" class="d-flex text-secondary profile-link link-active">
             <box-icon name='user' color="#6c757d"></box-icon>
             <h5>Profile Info</h5>
         </a>
@@ -162,103 +162,99 @@
 
     <main class="container pb-5">
 
-        <div class="d-flex">
-
-            <div class="flex-grow-1 p-2">
-
-                <!--Form for writting a new message-->
-                <div class="input-group input-group-lg mb-5">
-                    <span class="input-group-text" id="inputGroup-sizing-lg">
-                        <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                    </span>
-                    <input id="new-message" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" placeholder="Write a new message" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <!--User info-->
+        <div class="container text-center">
+            <div class="card mb-5">
+                <div class="card-body mx-3 row d-flex justify-content-center">
+                    <div class="col-lg-5 mt-3 p-2">
+                        <h5><span><box-icon type='solid' name='briefcase'></box-icon></span>Workplace:</h5>
+                        <p>place of current work</p>
+                    </div>
+                    <div class="col-lg-5 mt-3 p-2">
+                        <h5><span><box-icon type='solid' name='graduation'></box-icon></span>Studies:</h5>
+                        <p>School were you graduated</p>
+                    </div>
+                    <div class="col-lg-5 my-3 p-2">
+                        <h5><span><box-icon type='solid' name='map'></box-icon></span>Location:</h5>
+                        <p>Place where you live</p>
+                    </div>
+                    <div class="col-lg-5 my-3 p-2 ">
+                        <h5><span><box-icon type='solid' name='phone-call'></box-icon></span>Phone:</h5>
+                        <p>+58 426-520-9525</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!--Content-->
+        <!--Followers and Follows-->
         <div class="container">
 
             <div class="row">
 
                 <div class="col-sm">
 
-                    <h4>Latest Favorite</h4>
+                    <h4>Followers</h4>
 
                     <div class="card mb-5">
 
-                        <div class="card-body mx-3">
-    
-                            <div class="d-flex align-items-center justify-content-between">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                                    <p class="mt-3 ms-2">Username</p>
-                                </a>  
-                                <h6 class="card-subtitle mt-1 text-body-secondary">Jul 27 2024</h6>
-                            </div>
-    
-                            <h5 class="card-title mt-3">Card title</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci nostrum obcaecati sint repudiandae commodi totam cupiditate! Repudiandae sunt esse nihil eius quae, ex omnis, obcaecati quod voluptatibus, at rem necessitatibus.</p>
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="#"><box-icon name='heart'></box-icon></a>
-                                <p>500</p>
-                            </div>
+                        <div class="card-body mx-3 text-center position-relative" style="height: 304px;">
+                            <nav class="navbar">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" href="#">
+                                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                            <p class="mt-3 ms-2">Username</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" href="#">
+                                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                            <p class="mt-3 ms-2">Username</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" href="#">
+                                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                            <p class="mt-3 ms-2">Username</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <a href="#" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle">See all users</a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-sm">
 
-                    <h4>Latest Message</h4>
+                    <h4>Following</h4>
 
-                    <div class="card mb-5">
+                    <div class="card mb-5" >
 
-                        <div class="card-body mx-3">
-    
-                            <div class="d-flex align-items-center justify-content-between">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                                    <p class="mt-3 ms-2">Username</p>
-                                </a>  
-                                <h6 class="card-subtitle mt-1 text-body-secondary">Jul 27 2024</h6>
-                            </div>
-    
-                            <h5 class="card-title mt-3">Card title</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci nostrum obcaecati sint repudiandae commodi totam cupiditate! Repudiandae sunt esse nihil eius quae, ex omnis, obcaecati quod voluptatibus, at rem necessitatibus.</p>
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="#"><box-icon name='heart'></box-icon></a>
-                                <p>500</p>
-                            </div>
+                        <div class="card-body mx-3 text-center position-relative" style="height: 304px;">
+                            <nav class="navbar">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" href="#">
+                                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                            <p class="mt-3 ms-2">Username</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link d-flex align-items-center" href="#">
+                                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                            <p class="mt-3 ms-2">Username</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <a href="#" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle">See all users</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-    <!--Modal for posting a new message-->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="mb-3">
-                  <label for="message-text" class="col-form-label">Message:</label>
-                  <textarea class="form-control" id="message-text"></textarea>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Post message</button>
-            </div>
-          </div>
-        </div>
-    </div>
 
     <!--Modal for editing profile-->
     <div class="modal fade modal-lg" id="modal-edit-profile" tabindex="-1" aria-labelledby="edit-profile-Label" aria-hidden="true">

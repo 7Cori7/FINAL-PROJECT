@@ -1,14 +1,24 @@
+:root{
+    --blue: #00b7ff;
+}
+
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-body{
-    color: #252525;
-}
 
 a{
     text-decoration: none;
+}
+
+.profile-link:hover{
+    filter: brightness(0.4);
+    transition: ease .5s;
+}
+
+.link-active{
+    border-bottom: 2px solid var(--blue);
 }
 
 .search-btn{
