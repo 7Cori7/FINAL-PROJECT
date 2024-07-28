@@ -18,13 +18,13 @@
 <body class="bg-light">
 
     <!-- Navbar -->
-    <nav class="bg-light border navbar navbar-expand-md navbar-light sticky-top">
+    <nav class="bg-light navbar navbar-expand-md navbar-light sticky-top">
 
         <div class="container-fluid">
 
             <!--Logo-->
             <a class="navbar-brand" href="/">
-                <img src="../static/whiteboard-logo.svg" alt="WhiteBoard logo" width="200">
+                <img src="../static/whiteboard-logo.svg" alt="WhiteBoard logo" width="200" loading="lazy">
             </a>
 
             <!--Toggle menu btn-->
@@ -36,21 +36,20 @@
             <div class="collapse navbar-collapse" id="navbar">
 
                 <!--if user is logged-->
-                {% if session["user_id"] %}
-                <div class="container mt-2"></div>
+                <div class="container mt-2 d-md-none d-xl-block"></div>
 
                 <div class="container-lg mt-2">
                     <form class="d-flex align-items-center" role="search">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <span>
+                        <button class="search-btn" type="submit">
                             <box-icon name='search'></box-icon>
-                        </span>
+                        </button>
                     </form>
                 </div>
 
-                <div class="container mt-2"></div>
+                <div class="container mt-2 d-md-none d-xl-block"></div>
 
-                <ul class="navbar-nav ms-auto mt-2 d-lg-flex align-items-lg-center">
+                <ul class="navbar-nav ms-auto mt-2 d-md-flex align-items-md-center">
 
                     <li class="nav-item dropdown me-1">
                         <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
@@ -73,8 +72,9 @@
 
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                             <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                            <p class="mt-3 ms-2">Username</p>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start">
+                        <ul class="dropdown-menu">
                             <li>
                               <a class="dropdown-item" href="#">My profile</a>
                             </li>
@@ -85,9 +85,8 @@
                     </li>
                 </ul>
 
-                {% else %}
                 <!--if user is not logged-->
-                <!-- <ul class="navbar-nav ms-auto mt-2">
+                <ul class="navbar-nav ms-auto mt-2">
 
                     <li class="nav-item me-md-2 mt-md-0 mt-sm-5">
                         <button class="btn btn-outline-secondary" type="button">
@@ -100,8 +99,7 @@
                             <a class="nav-link" href="/login">Register</a>
                         </button>
                     </li>
-                </ul> -->
-                {% endif %}
+                </ul>
             </div>
 
         </div>
