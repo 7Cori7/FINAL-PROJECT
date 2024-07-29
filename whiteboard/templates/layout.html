@@ -6,6 +6,8 @@
     
     <!-- http://getbootstrap.com/docs/5.3/ -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
     <link rel="stylesheet" href="../static/styles.css">
     <link rel="icon" href="../static/pen.svg" type="image/svg">
@@ -13,7 +15,7 @@
     <!--boxicons-->
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     
-    <title>WhiteBoard {% block title %}{% endblock %}</title>
+    <title>WhiteBoard - {% block title %}{% endblock %}</title>
 </head>
 <body class="bg-light">
 
@@ -36,6 +38,7 @@
             <div class="collapse navbar-collapse" id="navbar">
 
                 <!--if user is logged-->
+                {% if session["user_id"] %}
                 <div class="container mt-2 d-md-none d-xl-block"></div>
 
                 <div class="container-lg mt-2">
@@ -72,20 +75,26 @@
 
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                             <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                            <p class="mt-3 ms-2">Username</p>
+                            {% for user in users %}
+                                <p class="mt-3 ms-2">{{ user.username }}</p>
+                            {% endfor %}
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                              <a class="dropdown-item" href="#">My profile</a>
+                              <a class="dropdown-item" href="/profile/:username">My profile</a>
                             </li>
                             <li>
-                              <a class="dropdown-item" href="#">Logout</a>
+                              <a class="dropdown-item" href="/settings/:id">Settings</a>
+                            </li>
+                            <li>
+                              <a class="dropdown-item" href="/logout">Logout</a>
                             </li>
                         </ul>
                     </li>
                 </ul>
 
                 <!--if user is not logged-->
+                {% else %}
                 <ul class="navbar-nav ms-auto mt-2">
 
                     <li class="nav-item me-md-2 mt-md-0 mt-sm-5">
@@ -96,10 +105,11 @@
 
                     <li class="nav-item me-md-5 mt-md-0 mt-sm-2">
                         <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/login">Register</a>
+                            <a class="nav-link" href="/register">Register</a>
                         </button>
                     </li>
                 </ul>
+                {% endif %}
             </div>
 
         </div>
@@ -115,19 +125,11 @@
     </header>
     {% endif %}
 
-    <main class="container py-5 text-center">
+    <main class="container py-5">
         {% block main %}{% endblock %}
     </main>
 
     <!--Footer only if not in homepage-->
-    <footer class="mb-5">
-        <p class="mb-3 small text-center text-muted">
-            Corina IDL <span id="date"></span> All Rights Reserved
-        </p>
-        <script> document.querySelector('#date').innerHTML = new Date().getFullYear(); </script>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% block footer %}{% endblock %}
 </body>
 </html>
