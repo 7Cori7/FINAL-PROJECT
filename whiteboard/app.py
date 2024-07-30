@@ -7,10 +7,13 @@ from flask_session import Session
 import pytz
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import login_required
+from helpers import login_required, format_date
 
 # Application
 app = Flask(__name__)
+
+# Custom filter
+app.jinja_env.filters["format_date"] = format_date
 
 # Session
 app.config["SESSION_PERMANENT"] = False
@@ -41,7 +44,7 @@ def index():
         db.execute("INSERT INTO followers (user_id, follows) VALUES (?, ?)", session["user_id"], session["user_id"]) 
 
     # Get all the messages from the people the user is following
-    messages = db.execute("SELECT username, image, content, likes, date, messages.id FROM users, messages, followers WHERE users.id = messages.user_id AND messages.user_id = followers.follows AND followers.user_id = ? ORDER BY date DESC", session["user_id"])
+    messages = db.execute("SELECT username, image, content, likes, date, messages.id, messages.user_id FROM users, messages, followers WHERE users.id = messages.user_id AND messages.user_id = followers.follows AND followers.user_id = ? ORDER BY date DESC", session["user_id"])
 
     # Get 5 people the user is following
     following = db.execute("SELECT username, image FROM users, followers WHERE users.id = followers.follows AND followers.user_id = ? AND followers.follows != ? LIMIT 5", session["user_id"], session["user_id"])
@@ -49,7 +52,25 @@ def index():
     return render_template("index.html", users=users, messages=messages, following=following)
 
 
-#TODO: Route for Likes
+@app.route("/liked/<int:message_id>/<int:user>")
+@login_required
+def liked(message_id, user):
+    """Update the likes of a message"""
+    # Check if the user already liked the message
+    like = db.execute("SELECT * FROM favorites WHERE user_id = ? AND message_id = ?", session["user_id"], message_id)
+
+    # Actions to take accordingly
+    if not like:
+        db.execute("UPDATE messages SET likes = likes + 1 WHERE user_id = ? AND id = ?", user, message_id)
+        db.execute("INSERT INTO favorites (user_id, message_id) VALUES (?, ?)", session["user_id"], message_id)
+    
+    else:
+        db.execute("DELETE FROM favorites WHERE user_id = ? AND message_id = ?", session["user_id"], message_id)
+        db.execute("UPDATE messages SET likes = likes - 1 WHERE user_id = ? AND id = ?", user, message_id)
+    
+    # Refresh the page
+    return redirect("/")
+    
 
 #TODO: Route for Search
 

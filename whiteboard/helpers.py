@@ -1,3 +1,4 @@
+import datetime
 from flask import redirect, render_template, request, session
 from functools import wraps
 
@@ -15,3 +16,10 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def format_date(date):
+    """Format the date"""
+    date_obj = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+    new_format = date_obj.strftime('%B %d, %Y %I:%M %p')
+    return new_format
