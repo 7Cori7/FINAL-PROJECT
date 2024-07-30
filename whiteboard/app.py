@@ -32,12 +32,28 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    """Get the messages, and followers corresponding to the user to print them in the homepage"""
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"]) 
 
-    #TODO: Get the messages, and followers corresponding to the user to print them in the homepage
+    hack = db.execute("SELECT * FROM followers WHERE user_id = ? AND follows = ?", session["user_id"], session["user_id"])
 
-    return render_template("index.html", users=users)
+    if not hack:
+        db.execute("INSERT INTO followers (user_id, follows) VALUES (?, ?)", session["user_id"], session["user_id"]) 
 
+    # Get all the messages from the people the user is following
+    messages = db.execute("SELECT username, image, content, likes, date, messages.id FROM users, messages, followers WHERE users.id = messages.user_id AND messages.user_id = followers.follows AND followers.user_id = ? ORDER BY date DESC", session["user_id"])
+
+    # Get 5 people the user is following
+    following = db.execute("SELECT username, image FROM users, followers WHERE users.id = followers.follows AND followers.user_id = ? AND followers.follows != ? LIMIT 5", session["user_id"], session["user_id"])
+
+    return render_template("index.html", users=users, messages=messages, following=following)
+
+
+#TODO: Route for Likes
+
+#TODO: Route for Search
+
+#TODO: Route for User Profile
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -81,7 +97,7 @@ def login():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("login.html", error=error)
+        return render_template("login.html", error=error, page="login")
 
 
 @app.route("/logout")
@@ -93,6 +109,27 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+
+@app.route("/publish", methods=["GET", "POST"])
+@login_required
+def publish():
+    """Publishing a new message"""
+    if request.method == "POST":
+        # Ensure a message content is submitted
+        if not request.form.get("content"):
+            return
+        # Get the data
+        content = request.form.get("content")
+        date = datetime.datetime.now(pytz.timezone("US/Eastern"))
+
+        # Insert in db
+        db.execute("INSERT INTO messages (user_id, content, date) VALUES (?,?,?)", session["user_id"], content, date)
+
+        # Refresh homepage
+        return redirect("/")
+    return render_template("index.html")
+        
 
 
 @app.route("/register", methods=["GET", "POST"])

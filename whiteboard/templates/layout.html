@@ -39,76 +39,83 @@
 
                 <!--if user is logged-->
                 {% if session["user_id"] %}
-                <div class="container mt-2 d-md-none d-xl-block"></div>
+                    <div class="container mt-2 d-md-none d-xl-block"></div>
 
-                <div class="container-lg mt-2">
-                    <form class="d-flex align-items-center" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="search-btn" type="submit">
-                            <box-icon name='search'></box-icon>
-                        </button>
-                    </form>
-                </div>
+                    <div class="container-lg mt-2">
+                        <form class="d-flex align-items-center" role="search">
+                            <input class="form-control me-2" type="search" placeholder="Search for users" aria-label="Search">
+                            <button class="search-btn" type="submit">
+                                <box-icon name='search'></box-icon>
+                            </button>
+                        </form>
+                    </div>
 
-                <div class="container mt-2 d-md-none d-xl-block"></div>
+                    <div class="container mt-2 d-md-none d-xl-block"></div>
 
-                <ul class="navbar-nav ms-auto mt-2 d-md-flex align-items-md-center">
+                    <ul class="navbar-nav ms-auto mt-2 d-md-flex align-items-md-center">
 
-                    <li class="nav-item dropdown me-1">
-                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <box-icon name='heart'></box-icon>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                              <a class="dropdown-item" href="#">Element 1</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="#">Element 2</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="#">Element 3</a>
-                            </li>
-                        </ul>
-                    </li>
+                        <li class="nav-item dropdown me-1">
+                            <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <box-icon name='heart'></box-icon>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                <a class="dropdown-item" href="#">Element 1</a>
+                                </li>
+                                <li>
+                                <a class="dropdown-item" href="#">Element 2</a>
+                                </li>
+                                <li>
+                                <a class="dropdown-item" href="#">Element 3</a>
+                                </li>
+                            </ul>
+                        </li>
 
-                    <li class="nav-item dropdown me-lg-5">
-
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                        <li class="nav-item dropdown me-lg-5">
                             {% for user in users %}
-                                <p class="mt-3 ms-2">{{ user.username }}</p>
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="/profile/{{ user.username }}" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                    <img src="../static/{{ user.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                    <p class="mt-3 ms-2">{{ user.username }}</p>
+                            </a>
                             {% endfor %}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                              <a class="dropdown-item" href="/profile/:username">My profile</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="/settings/:id">Settings</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="/logout">Logout</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                            <ul class="dropdown-menu">
+                                {% for user in users %}
+                                <li>
+                                    <a class="dropdown-item" href="/profile/{{ user.username }}">My profile</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/settings/{{ user.id }}">Settings</a>    
+                                </li>
+                                {% endfor %}
+                                <li>
+                                    <a class="dropdown-item" href="/logout">Logout</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
 
                 <!--if user is not logged-->
                 {% else %}
-                <ul class="navbar-nav ms-auto mt-2">
+                    <ul class="navbar-nav ms-auto mt-2">
 
-                    <li class="nav-item me-md-2 mt-md-0 mt-sm-5">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/login">Log In</a>
-                        </button>
-                    </li>
+                        {% if page %}
 
-                    <li class="nav-item me-md-5 mt-md-0 mt-sm-2">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/register">Register</a>
-                        </button>
-                    </li>
-                </ul>
+                            <li class="nav-item me-md-5 mt-md-0 mt-sm-2">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <a class="nav-link" href="/register">Register</a>
+                                </button>
+                            </li>
+
+                        {% else %}
+
+                            <li class="nav-item me-md-5 mt-md-0 mt-sm-2">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <a class="nav-link" href="/login">Log In</a>
+                                </button>
+                            </li>
+
+                        {% endif %}
+                    </ul>
                 {% endif %}
             </div>
 
@@ -128,6 +135,8 @@
     <main class="container py-5">
         {% block main %}{% endblock %}
     </main>
+
+    {% block modal %}{% endblock %}
 
     <!--Footer only if not in homepage-->
     {% block footer %}{% endblock %}
