@@ -52,6 +52,75 @@ def index():
     return render_template("index.html", users=users, messages=messages, following=following)
 
 
+@app.route("/delete-message", methods=["POST"])
+@login_required
+def delete_message():
+    """Delete a message"""
+    # Check if all data was correctly sent
+    if not request.form.get("id"):
+        flash("An error occurred when deleting the message")
+        return redirect("/")
+    
+    message_id = request.form.get("id")
+
+    # Get message by id, and confirm if it match with the user in session
+    user_message = db.execute("SELECT * FROM messages WHERE id = ? AND user_id = ?", message_id, session["user_id"])
+
+    if user_message:
+        db.execute("DELETE FROM favorites WHERE message_id = ?", message_id)
+        db.execute("DELETE FROM messages WHERE id = ?", message_id)
+    
+    return redirect("/")
+
+
+@app.route("/edit-message", methods=["POST"])
+@login_required
+def edit_message():
+    """Update a message"""
+    # Check if all data was correctly sent
+    if not request.form.get("id"):
+        flash("An error occurred when updating the message")
+        return redirect("/")
+    if not request.form.get("content"):
+        flash("An error occurred when updating the message")
+        return redirect("/")
+    
+    message_id = request.form.get("id")
+    message_content = request.form.get("content")
+
+    # Get message by id, and confirm if it match with the user in session
+    user_message = db.execute("SELECT * FROM messages WHERE id = ? AND user_id = ?", message_id, session["user_id"])
+
+    if user_message:
+        db.execute("UPDATE messages SET content = ? WHERE id = ? AND user_id = ?", message_content, message_id, session["user_id"])
+    
+    return redirect("/")
+
+
+@app.route("/follow/<username>/<int:user_id>")
+@login_required
+def follow_user(username, user_id):
+    """Start following a user"""
+    # Prevent the user from following themself
+    if user_id == session["user_id"]:
+        flash("You can't follow yourself !!! 😭")
+        return redirect("/")
+    
+    # Prevent to follow an user more than once
+    following = db.execute("SELECT username, follows FROM users, followers WHERE users.id = followers.follows and followers.user_id = ?", session["user_id"])
+
+    for row in following:
+        if row["username"] == username or row["follows"] == user_id:
+            flash("You can't follow the same person more than once 😵")
+            return redirect("/")
+
+    # Insert user into DB
+    if user_id and username:
+        db.execute("INSERT INTO followers (user_id, follows) VALUES (?, ?)", session["user_id"], user_id)
+        # return redirect("/profile/"+username)
+    
+    return redirect("/")
+
 @app.route("/liked/<int:message_id>/<int:user>")
 @login_required
 def liked(message_id, user):
@@ -71,10 +140,6 @@ def liked(message_id, user):
     # Refresh the page
     return redirect("/")
     
-
-#TODO: Route for Search
-
-#TODO: Route for User Profile
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -132,26 +197,27 @@ def logout():
     return redirect("/")
 
 
-@app.route("/publish", methods=["GET", "POST"])
+#TODO: Route for Profile
+
+
+@app.route("/publish", methods=["POST"])
 @login_required
 def publish():
     """Publishing a new message"""
-    if request.method == "POST":
-        # Ensure a message content is submitted
-        if not request.form.get("content"):
-            return
-        # Get the data
-        content = request.form.get("content")
-        date = datetime.datetime.now(pytz.timezone("US/Eastern"))
+    
+    # Ensure a message content is submitted
+    if not request.form.get("content"):
+        return
+    # Get the data
+    content = request.form.get("content")
+    date = datetime.datetime.now(pytz.timezone("US/Eastern"))
 
-        # Insert in db
-        db.execute("INSERT INTO messages (user_id, content, date) VALUES (?,?,?)", session["user_id"], content, date)
+    # Insert in db
+    db.execute("INSERT INTO messages (user_id, content, date) VALUES (?,?,?)", session["user_id"], content, date)
 
-        # Refresh homepage
-        return redirect("/")
-    return render_template("index.html")
+    # Refresh homepage
+    return redirect("/")   
         
-
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -207,3 +273,34 @@ def register():
         return redirect("/login")
     
     return render_template("register.html", error=error)
+
+
+@app.route("/search")
+def search():
+    """Search for users"""
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"]) 
+    if not request.args.get("user"):
+        flash("Enter a name to search")
+        return redirect("/")
+    search = request.args.get("user")
+    search_list = db.execute("SELECT image, username, id FROM users WHERE username LIKE ? OR name LIKE ?", '%'+search+'%', '%'+search+'%')
+    following_list = db.execute("SELECT * FROM followers WHERE user_id = ?", session["user_id"])
+
+    for user in search_list:
+        for row in following_list:
+            if user["id"] == row["follows"]:
+                user["following"] = True
+            else:
+                user["following"] = False
+
+    return render_template("search.html", search_list=search_list, users=users)
+
+
+@app.route("/unfollow/<username>/<int:user_id>")
+@login_required
+def unfollow_user(username, user_id):
+    """Stop following a user"""
+    if user_id and username:
+        db.execute("DELETE FROM followers WHERE user_id = ? AND follows = ?", session["user_id"], user_id)
+    
+    return redirect("/")
