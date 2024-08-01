@@ -135,7 +135,6 @@ def edit_profile(username):
     return redirect("/profile-"+username)
 
 
-# TODO Favorites page
 @app.route("/favorites-<username>")
 @login_required
 def favorites(username):
@@ -150,9 +149,19 @@ def favorites(username):
         return render_template("notfound.html")
     
     profile_id = profile[0]["id"]
+
+    if profile_id == session["user_id"]:
+        profile[0]["session"] = True
+    else:
+        profile[0]["session"] = False
+        is_followed = db.execute("SELECT * FROM followers WHERE follows = ? AND user_id = ?", profile_id, session["user_id"])
+        if is_followed:
+            profile[0]["following"] = True
+        else:
+            profile[0]["following"] = False
     
     # Get the followers count
-    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ?", username)
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ? AND followers.user_id != ?", username, profile_id)
     total_followers = followers[0]["COUNT(follows)"]
     # Get the following count
     following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
@@ -188,6 +197,47 @@ def follow_user(username, user_id):
     return redirect("/profile-"+username)
 
 
+@app.route("/followers-<username>")
+@login_required
+def followers(username):
+    """Print all followers"""
+    if not username:
+        return render_template("notfound.html")
+    # Get the session
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    # Get the profile data
+    profile = db.execute("SELECT * FROM users WHERE username = ?", username)
+    if not profile:
+        return render_template("notfound.html")
+    
+    profile_id = profile[0]["id"]
+    # Get followers list
+    list_followers = db.execute("SELECT username, name, image FROM users, followers WHERE users.id = followers.user_id AND followers.follows = ? AND followers.user_id != ?", profile_id, profile_id)
+
+    return render_template("followers.html", users=users, profile=profile, followers=list_followers)
+
+
+@app.route("/following-<username>")
+@login_required
+def following(username):
+    """Print all following"""
+    """Print all followers"""
+    if not username:
+        return render_template("notfound.html")
+    # Get the session
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    # Get the profile data
+    profile = db.execute("SELECT * FROM users WHERE username = ?", username)
+    if not profile:
+        return render_template("notfound.html")
+    
+    profile_id = profile[0]["id"]
+    # Get following list
+    list_following = db.execute("SELECT username, name, image FROM users, followers WHERE users.id = followers.follows AND followers.user_id = ? AND followers.follows != ?", profile_id, profile_id)
+
+    return render_template("following.html", users=users, profile=profile, following=list_following)
+
+
 @app.route("/history-<username>")
 @login_required
 def history(username):
@@ -214,7 +264,7 @@ def history(username):
             profile[0]["following"] = False
     
     # Get the followers count
-    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ?", username)
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ? AND followers.user_id != ?", username, profile_id)
     total_followers = followers[0]["COUNT(follows)"]
     # Get the following count
     following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
@@ -223,6 +273,46 @@ def history(username):
     messages = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC", username)
 
     return render_template("history.html", users=users, path=path, profile=profile, followers=total_followers, following=total_following, messages=messages)
+
+
+@app.route("/info-<username>")
+@login_required
+def info(username):
+    path = "info-"+username
+    if not username:
+        return render_template("notfound.html")
+    # Get the session
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    # Get the profile data
+    profile = db.execute("SELECT * FROM users WHERE username = ?", username)
+    if not profile:
+        return render_template("notfound.html")
+    
+    profile_id = profile[0]["id"]
+
+    if profile_id == session["user_id"]:
+        profile[0]["session"] = True
+    else:
+        profile[0]["session"] = False
+        is_followed = db.execute("SELECT * FROM followers WHERE follows = ? AND user_id = ?", profile_id, session["user_id"])
+        if is_followed:
+            profile[0]["following"] = True
+        else:
+            profile[0]["following"] = False
+    
+    # Get the followers count
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ? AND followers.user_id != ?", username, profile_id)
+    total_followers = followers[0]["COUNT(follows)"]
+    # Get the following count
+    following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
+    total_following = following[0]["COUNT(user_id)"]
+
+    # Get followers list of 3
+    list_followers = db.execute("SELECT username, image FROM users, followers WHERE users.id = followers.user_id AND followers.follows = ? AND followers.user_id != ? LIMIT 3", profile_id, profile_id)
+    # Get following list of 3
+    list_following = db.execute("SELECT username, image FROM users, followers WHERE users.id = followers.follows AND followers.user_id = ? AND followers.follows != ? LIMIT 3", profile_id, profile_id)
+    
+    return render_template("info.html", path=path, users=users, profile=profile, following=total_following, followers= total_followers, list_followers=list_followers, list_following=list_following)
 
 
 @app.route("/image/<username>", methods=["POST"])
@@ -355,7 +445,7 @@ def profile(username):
                 row["following"] = False
     
     # Get the followers count
-    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ?", username)
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ? AND followers.user_id != ?", username, profile_id)
     for item in followers:
         total_followers = item["COUNT(follows)"]
     # Get the following count
