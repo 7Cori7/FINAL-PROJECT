@@ -1,307 +1,314 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- http://getbootstrap.com/docs/5.3/ -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <link rel="stylesheet" href="../static/styles.css">
-    <link rel="icon" href="../static/pen.svg" type="image/svg">
+{% extends "layout.html" %}
 
-    <!--boxicons-->
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-    
-    <title>WhiteBoard - Profile</title>
-</head>
-<body class="bg-light">
+{% block title %}
+    Profile
+{% endblock %}
 
-    <!-- Navbar -->
-    <nav class="bg-light navbar navbar-expand-md navbar-light sticky-top">
-
-        <div class="container-fluid">
-
-            <!--Logo-->
-            <a class="navbar-brand" href="index.html">
-                <img src="../static/whiteboard-logo.svg" alt="WhiteBoard logo" width="200" loading="lazy">
-            </a>
-
-            <!--Toggle menu btn-->
-            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!--Navbar content-->
-            <div class="collapse navbar-collapse" id="navbar">
-
-                <!--if user is logged-->
-                <div class="container mt-2 d-md-none d-xl-block"></div>
-
-                <div class="container-lg mt-2">
-                    <form class="d-flex align-items-center" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="search-btn" type="submit">
-                            <box-icon name='search'></box-icon>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="container mt-2 d-md-none d-xl-block"></div>
-
-                <ul class="navbar-nav ms-auto mt-2 d-md-flex align-items-md-center">
-
-                    <li class="nav-item dropdown me-1">
-                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <box-icon name='heart'></box-icon>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                              <a class="dropdown-item" href="#">Element 1</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="#">Element 2</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="#">Element 3</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item dropdown me-lg-5">
-
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                            <p class="mt-3 ms-2">Username</p>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                              <a class="dropdown-item" href="profile.html">My profile</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="settings.html">Settings</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="login.html">Logout</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <!--if user is not logged-->
-                <!-- <ul class="navbar-nav ms-auto mt-2">
-
-                    <li class="nav-item me-md-2 mt-md-0 mt-sm-5">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/login">Log In</a>
-                        </button>
-                    </li>
-
-                    <li class="nav-item me-md-5 mt-md-0 mt-sm-2">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/login">Register</a>
-                        </button>
-                    </li>
-                </ul> -->
-            </div>
-
-        </div>
-        
-    </nav>
-
-    <!--Profile abstract-->
+<!--Header-->
+{% block header %}
     <header class="container-fluid pt-5 mt-3 px-5 border">
 
         <div id="profile-header" class="d-md-flex justify-content-between">
             <div class="d-lg-flex align-items-center justify-content-center gap-3">
-                <img src="../static/avatar.jpg" class="rounded-circle" height="150" alt="Avatar" loading="lazy" />
-                <div>
-                    <a href="profile.html">
-                        <h3 class="text-dark">Username</h3>
-                        <h6 class="text-dark">Name Lastname</h6>
-                    </a>
-                    <p>Joined on Jul 28 2024</p>
-                </div>
+                {% for row in profile %}
+                    <img src="../static/avatar.jpg" class="rounded-circle" height="150" alt="Avatar" loading="lazy" />
+                    <div>
+                        <a href="profile.html">
+                            <h3 class="text-dark">{{ row.username }}</h3>
+                            <h6 class="text-dark">{{ row.name }}</h6>
+                        </a>
+                        <!--Todo-->
+                        <p>Joined on Jul 28 2024</p>
+                        <!--Todo-->
+                    </div>
+                {% endfor %}
             </div>
             <div>
-                <button type="button" class="btn btn-primary btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#modal-edit-profile">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);"><path d="M8.707 19.707 18 10.414 13.586 6l-9.293 9.293a1.003 1.003 0 0 0-.263.464L3 21l5.242-1.03c.176-.044.337-.135.465-.263zM21 7.414a2 2 0 0 0 0-2.828L19.414 3a2 2 0 0 0-2.828 0L15 4.586 19.414 9 21 7.414z"></path></svg>
-                    Edit
-                </button>
+                {% for row in profile %}
+                    {% if row.session %}
+                        <button type="button" class="btn btn-primary btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#modal-edit-profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);"><path d="M8.707 19.707 18 10.414 13.586 6l-9.293 9.293a1.003 1.003 0 0 0-.263.464L3 21l5.242-1.03c.176-.044.337-.135.465-.263zM21 7.414a2 2 0 0 0 0-2.828L19.414 3a2 2 0 0 0-2.828 0L15 4.586 19.414 9 21 7.414z"></path></svg>
+                            Edit
+                        </button>
+
+                        <!--Modal for editing profile-->
+                        <div class="modal fade modal-lg" id="modal-edit-profile" tabindex="-1" aria-labelledby="edit-profile-Label" aria-hidden="true">
+                            <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="edit-profile-Label">Edit Profile</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                <!--TODO-->
+                                <form>
+                                    <div class="mb-3">
+                                    <label for="workplace" class="col-form-label">Workplace:</label>
+                                    <input type="text" class="form-control" id="workplace" placeholder="Your workplace">
+                                    </div>
+                                    <div class="mb-3">
+                                    <label for="location" class="col-form-label">Where you live:</label>
+                                    <input type="text" class="form-control" id="location" placeholder="Enter your location">
+                                    </div>
+                                    <div class="mb-3">
+                                    <label for="studies" class="col-form-label">Studies:</label>
+                                    <input type="text" class="form-control" id="studies" placeholder="Your studies">
+                                    </div>
+                                    <div class="mb-3">
+                                    <label for="phone" class="col-form-label">Phone:</label>
+                                    <input type="tel" class="form-control" id="phone" placeholder="Your phone number">
+                                    </div>
+                                </form>
+                                <!--TODO-->
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                    {% else %}
+                        {% if row.following %}
+                            <a href="/unfollow/{{row.username}}/{{row.id}}" class="btn btn-danger btn-lg btn-block">Unfollow {{ row.username }}</a>
+                        {% else %}
+                            <a href="/follow/{{row.username}}/{{row.id}}" class="btn btn-primary btn-lg btn-block d-flex align-items-center"><box-icon name='plus' color="#ffffff"></box-icon> Follow {{ row.username }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
         <div id="profile-header_followers-container" class="d-flex gap-5 mt-3">
             <div class="container d-none d-md-block"></div>
             <div class="d-flex align-items-baseline gap-2">
-                <p>500</p>
+                <p>{{ followers }}</p>
                 <h5>Followers</h5>
             </div>
             <div class="d-flex align-items-baseline gap-2">
-                <p>50</p>
+                <p>{{ following }}</p>
                 <h5>Following</h5>
             </div>
         </div>
     </header>
 
     <div class="container-fluid pb-5 mt-4 px-5 d-flex justify-content-lg-around justify-content-center flex-wrap gap-3">
-        <a href="favorites.html" class="d-flex text-secondary profile-link">
-            <box-icon name='heart' color="#6c757d"></box-icon>
-            <h5>Favorites</h5>
-        </a>
-        <a href="history.html" class="d-flex text-secondary profile-link">
-            <box-icon name='notepad' color="#6c757d"></box-icon>
-            <h5>History</h5>
-        </a>
-        <a href="info.html" class="d-flex text-secondary profile-link">
-            <box-icon name='user' color="#6c757d"></box-icon>
-            <h5>Profile Info</h5>
-        </a>
+        {% for row in profile %}
+            {% if row.session %}
+                <a href="favorites.html" class="d-flex text-secondary profile-link">
+                    <box-icon name='heart' color="#6c757d"></box-icon>
+                    <h5>Favorites</h5>
+                </a>
+                <a href="history.html" class="d-flex text-secondary profile-link">
+                    <box-icon name='notepad' color="#6c757d"></box-icon>
+                    <h5>History</h5>
+                </a>
+                <a href="info.html" class="d-flex text-secondary profile-link">
+                    <box-icon name='user' color="#6c757d"></box-icon>
+                    <h5>Profile Info</h5>
+                </a>
+            {% else %}
+                <a href="history.html" class="d-flex text-secondary profile-link">
+                    <box-icon name='notepad' color="#6c757d"></box-icon>
+                    <h5>History</h5>
+                </a>
+                <a href="info.html" class="d-flex text-secondary profile-link">
+                    <box-icon name='user' color="#6c757d"></box-icon>
+                    <h5>Profile Info</h5>
+                </a>
+            {% endif %}
+        {% endfor %}
     </div>
+{% endblock %}
 
-    <main class="container">
+{% block main %}
 
-        <div class="d-flex pb-5">
+    {% for row in profile %}
+        {% if row.session %}
+            <div class="d-flex pb-5">
 
-            <div class="flex-grow-1 p-2">
-
-                <!--Form for writting a new message-->
-                <div class="input-group input-group-lg mb-5">
-                    <span class="input-group-text" id="inputGroup-sizing-lg">
-                        <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                    </span>
-                    <input id="new-message" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" placeholder="Write a new message" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <div class="flex-grow-1 p-2">
+        
+                    <!--Form for writting a new message-->
+                    <div class="input-group input-group-lg mb-5">
+                        <span class="input-group-text" id="inputGroup-sizing-lg">
+                            {% for user in users %}
+                                <img src="../static/{{ user.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                            {% endfor %}
+                        </span>
+                        <input id="new-message" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" placeholder="Write a new message" data-bs-toggle="modal" data-bs-target="#new-msg-modal">
+                    </div>
+                    
                 </div>
             </div>
-        </div>
-
-        <!--Content-->
-        <div class="container">
-
-            <div class="row">
-
-                <div class="col-sm">
-
-                    <h4>Latest Favorite</h4>
-
-                    <div class="card mb-5">
-
-                        <div class="card-body mx-3">
+        {% endif %}
+    {% endfor %}
     
-                            <div class="d-flex align-items-center justify-content-between">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                                    <p class="mt-3 ms-2">Username</p>
-                                </a>  
-                                <h6 class="card-subtitle mt-1 text-body-secondary">Jul 27 2024</h6>
-                            </div>
-    
-                            <h5 class="card-title mt-3">Card title</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci nostrum obcaecati sint repudiandae commodi totam cupiditate! Repudiandae sunt esse nihil eius quae, ex omnis, obcaecati quod voluptatibus, at rem necessitatibus.</p>
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="#"><box-icon name='heart'></box-icon></a>
-                                <p>500</p>
-                            </div>
-                        </div>
+    <!--Content-->
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-sm">
+
+                <h4>Latest Favorite</h4>
+
+                <div class="card mb-5">
+
+                    <div class="card-body mx-3">
+                        {% if favorite %}
+                            {% for row in favorite %}
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <a class="nav-link d-flex align-items-center" href="/profile/{{ row.username }}">
+                                        <img src="../static/{{ row.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                        <p class="mt-3 ms-2">{{ row.username }}</p>
+                                    </a>  
+                                    <h6 class="card-subtitle mt-1 text-body-secondary">{{ row.date | format_date }}</h6>
+                                </div>
+
+                                <p class="card-text">{{ row.content }}</p>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="/liked/{{row.message_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                    <p>{{ row.likes }}</p>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                                <h6 class="text-center text-muted my-5">No favorites to show.</h6>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
 
-                <div class="col-sm">
+            <div class="col-sm">
 
-                    <h4>Latest Message</h4>
+                <h4>Latest Message</h4>
 
-                    <div class="card mb-5">
+                <div class="card mb-5">
 
-                        <div class="card-body mx-3">
-    
-                            <div class="d-flex align-items-center justify-content-between">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                                    <p class="mt-3 ms-2">Username</p>
-                                </a>  
-                                <h6 class="card-subtitle mt-1 text-body-secondary">Jul 27 2024</h6>
-                            </div>
-    
-                            <h5 class="card-title mt-3">Card title</h5>
-                            <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci nostrum obcaecati sint repudiandae commodi totam cupiditate! Repudiandae sunt esse nihil eius quae, ex omnis, obcaecati quod voluptatibus, at rem necessitatibus.</p>
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="#"><box-icon name='heart'></box-icon></a>
-                                <p>500</p>
-                            </div>
-                        </div>
+                    <div class="card-body mx-3">
+                        {% if message %}
+                            {% for row in message %}
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <a class="nav-link d-flex align-items-center" href="#">
+                                        <img src="../static/{{ row.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                        <p class="mt-3 ms-2">{{ row.username }}</p>
+                                    </a>  
+                                    <h6 class="card-subtitle mt-1 text-body-secondary">{{ row.date | format_date }}</h6>
+                                </div>
+
+                                <p class="card-text">{{ row.content }}</p>
+
+                                {% for user in profile %}
+                                    {% if user.session %}
+                                        <div class="d-flex justify-content-between gap-2">
+                                            <div class="d-flex gap-2">
+                                                <a href="#" class="p-2 bg-light rounded" data-bs-toggle="modal" data-bs-target="#edit-msg-modal-{{row.msg_id}}">Edit</a>
+
+                                                <a href="#" class="p-2 bg-light rounded text-danger" data-bs-toggle="modal" data-bs-target="#delete-msg-modal-{{row.msg_id}}">delete</a>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <a href="/liked/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                <p>{{ row.likes }}</p>
+                                            </div>
+                                        </div>
+
+                                        <!--Modal for editing a message-->
+                                        <div class="modal fade" id="edit-msg-modal-{{row.msg_id}}" tabindex="-1" aria-labelledby="edit-msg-modal-label" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="edit-msg-modal-label">Edit message</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <form class="onsubmit-disable" action="/edit-message" method="post" onkeyenter-click="#edit-msg-btn">
+                                                    <input type="hidden" name="id" value="{{row.msg_id}}">
+                                                    <div class="mb-3">
+                                                        <label for="content" class="col-form-label">Message:</label>
+                                                        <textarea class="form-control" name="content">{{ row.content }}</textarea>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button id="edit-msg-btn" type="submit" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                </form>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+
+                                        <!--Modal to Delete a message-->
+                                        <div class="modal fade" id="delete-msg-modal-{{row.msg_id}}" tabindex="-1" aria-labelledby="delete-msg-moda-label" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="delete-msg-moda-label">Delete Message</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                <p>Are you sure you want to delete this message?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <form class="onsubmit-disable" action="/delete-message" method="post" onkeyenter-click="#delete-msg-btn">
+                                                    <input type="hidden" name="id" value="{{row.msg_id}}">
+                                                    <button id="delete-msg-btn" type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="d-flex justify-content-end">
+                                            <div class="d-flex gap-2">
+                                                <a href="/liked/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                <p>{{ row.likes }}</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                                <h6 class="text-center text-muted my-5">No messages to show.</h6>
+                        {% endif%}
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+{% endblock %}
 
-    <!--Modal for posting a new message-->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!--Modal for posting a new message-->
+{% block modal_new_msg %}
+    <div class="modal fade" id="new-msg-modal" tabindex="-1" aria-labelledby="new-msg-modal-label" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
+        <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h1 class="modal-title fs-5" id="new-msg-modal-label">New message</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form>
+            <form class="onsubmit-disable" action="/publish" method="post" onkeyenter-click="#post-btn">
                 <div class="mb-3">
-                  <label for="message-text" class="col-form-label">Message:</label>
-                  <textarea class="form-control" id="message-text"></textarea>
+                <label for="content" class="col-form-label">Message:</label>
+                <textarea class="form-control" name="content"></textarea>
                 </div>
-              </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="post-btn" type="submit" class="btn btn-primary">Post message</button>
+                </div>
+            </form>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Post message</button>
-            </div>
-          </div>
+        </div>
         </div>
     </div>
+{% endblock %}
 
-    <!--Modal for editing profile-->
-    <div class="modal fade modal-lg" id="modal-edit-profile" tabindex="-1" aria-labelledby="edit-profile-Label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="edit-profile-Label">Edit Profile</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="mb-3">
-                  <label for="workplace" class="col-form-label">Workplace:</label>
-                  <input type="text" class="form-control" id="workplace" placeholder="Your workplace">
-                </div>
-                <div class="mb-3">
-                  <label for="location" class="col-form-label">Where you live:</label>
-                  <input type="text" class="form-control" id="location" placeholder="Enter your location">
-                </div>
-                <div class="mb-3">
-                  <label for="studies" class="col-form-label">Studies:</label>
-                  <input type="text" class="form-control" id="studies" placeholder="Your studies">
-                </div>
-                <div class="mb-3">
-                  <label for="phone" class="col-form-label">Phone:</label>
-                  <input type="tel" class="form-control" id="phone" placeholder="Your phone number">
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-    </div>
-
-    <!--Footer-->
+{% block footer %}
     <footer class="mb-5">
         <p class="mb-3 small text-center text-muted">
             Corina IDL <span id="date"></span> All Rights Reserved
         </p>
         <script> document.querySelector('#date').innerHTML = new Date().getFullYear(); </script>
     </footer>
-</body>
-</html>
+{% endblock %}

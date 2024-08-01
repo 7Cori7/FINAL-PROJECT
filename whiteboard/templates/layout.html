@@ -41,6 +41,7 @@
                 {% if session["user_id"] %}
                     <div class="container mt-2 d-md-none d-xl-block"></div>
 
+                    <!--Search bar-->
                     <div class="container-lg mt-2">
                         <form action="/search" class="d-flex align-items-center" role="search">
                             <input class="form-control me-2" type="search" placeholder="Search for users" aria-label="Search" name="user" autocomplete="off">
@@ -54,6 +55,7 @@
 
                     <ul class="navbar-nav ms-auto mt-2 d-md-flex align-items-md-center">
 
+                        <!--Notifications-->
                         <li class="nav-item dropdown me-1">
                             <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                 <box-icon name='heart'></box-icon>
@@ -71,12 +73,13 @@
                             </ul>
                         </li>
 
+                        <!--User in session-->
                         <li class="nav-item dropdown me-lg-5">
                             {% for user in users %}
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="/profile/{{ user.username }}" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
                                     <img src="../static/{{ user.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
                                     <p class="mt-3 ms-2">{{ user.username }}</p>
-                            </a>
+                                </a>
                             {% endfor %}
                             <ul class="dropdown-menu">
                                 {% for user in users %}
@@ -122,6 +125,9 @@
         </div>
         
     </nav>
+
+    <!--Header-->
+    {% block header %}{% endblock %}
 
     <!--Alert message popup-->
     {% if get_flashed_messages() %}

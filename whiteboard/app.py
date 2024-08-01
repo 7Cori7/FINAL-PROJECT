@@ -97,6 +97,9 @@ def edit_message():
     return redirect("/")
 
 
+# TODO Edit profile
+
+
 @app.route("/follow/<username>/<int:user_id>")
 @login_required
 def follow_user(username, user_id):
@@ -117,7 +120,7 @@ def follow_user(username, user_id):
     # Insert user into DB
     if user_id and username:
         db.execute("INSERT INTO followers (user_id, follows) VALUES (?, ?)", session["user_id"], user_id)
-        # return redirect("/profile/"+username)
+        return redirect("/profile/"+username)
     
     return redirect("/")
 
@@ -198,6 +201,49 @@ def logout():
 
 
 #TODO: Route for Profile
+@app.route("/profile/<username>")
+@login_required
+def profile(username):
+    """Getting data for profile page"""
+    if not username:
+        return render_template("notfound.html")
+    # Get the session
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    # Get the profile data
+    profile = db.execute("SELECT * FROM users WHERE username = ?", username)
+    if not profile:
+        return render_template("notfound.html")
+    
+    for row in profile:
+        profile_id = row["id"]
+        if profile_id == session["user_id"]:
+            row["session"] = True
+        else:
+            row["session"] = False
+            is_followed = db.execute("SELECT * FROM followers WHERE follows = ? AND user_id = ?", profile_id, session["user_id"])
+            if is_followed:
+                row["following"] = True
+            else:
+                row["following"] = False
+    
+    # Get the followers count
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ?", username)
+    for item in followers:
+        total_followers = item["COUNT(follows)"]
+    # Get the following count
+    following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
+    for item in following:
+        total_following = item["COUNT(user_id)"]
+    # Get the user's last favorite
+    favorite = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY date DESC LIMIT 1", profile_id)
+    # Get the user's last message
+    message = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC LIMIT 1", username)
+
+    print(favorite)
+    print(message)
+
+    return render_template("profile.html", users=users, profile=profile, followers=total_followers, following=total_following, favorite=favorite, message=message)
+    
 
 
 @app.route("/publish", methods=["POST"])
@@ -292,7 +338,14 @@ def search():
                 user["following"] = True
             else:
                 user["following"] = False
+            
+            if row["follows"] == session["user_id"]:
+                user["session"] = True
+            else:
+                user["session"] = False
 
+    print(search_list)
+    print(session["user_id"])
     return render_template("search.html", search_list=search_list, users=users)
 
 
