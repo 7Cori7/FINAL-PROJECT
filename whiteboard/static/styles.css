@@ -52,3 +52,13 @@ a{
         width: 300px;
     }
 }
+
+.login-content{
+    min-height: 60dvh;
+}
+
+@media(max-width:768px){
+    .login-content{
+        min-height: 70dvh;
+    }
+}

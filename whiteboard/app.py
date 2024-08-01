@@ -2,12 +2,14 @@ import os
 
 from cs50 import SQL
 import datetime
+from fileinput import filename
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 import pytz
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
-from helpers import login_required, format_date
+from helpers import login_required, format_date, allowed_file
 
 # Application
 app = Flask(__name__)
@@ -19,6 +21,11 @@ app.jinja_env.filters["format_date"] = format_date
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+# Handle file upload
+UPLOAD_FOLDER = "./static"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1000 * 1000
 
 # SQLite database
 db = SQL("sqlite:///whiteboard.db")
@@ -37,7 +44,7 @@ def after_request(response):
 def index():
     """Get the messages, and followers corresponding to the user to print them in the homepage"""
     users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"]) 
-
+    path = "home"
     hack = db.execute("SELECT * FROM followers WHERE user_id = ? AND follows = ?", session["user_id"], session["user_id"])
 
     if not hack:
@@ -49,12 +56,12 @@ def index():
     # Get 5 people the user is following
     following = db.execute("SELECT username, image FROM users, followers WHERE users.id = followers.follows AND followers.user_id = ? AND followers.follows != ? LIMIT 5", session["user_id"], session["user_id"])
 
-    return render_template("index.html", users=users, messages=messages, following=following)
+    return render_template("index.html", users=users, messages=messages, following=following, path=path)
 
 
-@app.route("/delete-message", methods=["POST"])
+@app.route("/delete-message/<path>", methods=["POST"])
 @login_required
-def delete_message():
+def delete_message(path):
     """Delete a message"""
     # Check if all data was correctly sent
     if not request.form.get("id"):
@@ -70,12 +77,15 @@ def delete_message():
         db.execute("DELETE FROM favorites WHERE message_id = ?", message_id)
         db.execute("DELETE FROM messages WHERE id = ?", message_id)
     
-    return redirect("/")
+    if path == "home":
+        return redirect("/")
+    else:
+        return redirect("/"+path)
 
 
-@app.route("/edit-message", methods=["POST"])
+@app.route("/edit-message/<path>", methods=["POST"])
 @login_required
-def edit_message():
+def edit_message(path):
     """Update a message"""
     # Check if all data was correctly sent
     if not request.form.get("id"):
@@ -94,10 +104,63 @@ def edit_message():
     if user_message:
         db.execute("UPDATE messages SET content = ? WHERE id = ? AND user_id = ?", message_content, message_id, session["user_id"])
     
-    return redirect("/")
+    if path == "home":
+        return redirect("/")
+    else:
+        return redirect("/"+path)
 
 
-# TODO Edit profile
+@app.route("/edit-profile/<username>", methods=["POST"])
+@login_required
+def edit_profile(username):
+    """Edit the user profile"""
+    # Check if the profile belongs to user in session
+    user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    if user[0]["username"] != username:
+        flash("Error! 😵❌")
+        return redirect("/")
+    # Check if all input fields were delivered
+    if not request.form.get("workplace") or not request.form.get("location") or not request.form.get("studies") or not request.form.get("phone"):
+        flash("❌An error occurred when updating the profile❌")
+        return redirect("/profile-"+username)
+    
+    # if all is good
+    workplace = request.form.get("workplace")
+    location = request.form.get("location")
+    studies = request.form.get("studies")
+    phone = request.form.get("phone")
+
+    db.execute("UPDATE users SET workplace = ?, location= ?, studies = ?, phone = ? WHERE username = ?", workplace, location, studies, phone, username)
+    flash("Your profile has been sucessfully updated! ✔️")
+    return redirect("/profile-"+username)
+
+
+# TODO Favorites page
+@app.route("/favorites-<username>")
+@login_required
+def favorites(username):
+    path = "favorites-"+username
+    if not username:
+        return render_template("notfound.html")
+    # Get the session
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    # Get the profile data
+    profile = db.execute("SELECT * FROM users WHERE username = ?", username)
+    if not profile:
+        return render_template("notfound.html")
+    
+    profile_id = profile[0]["id"]
+    
+    # Get the followers count
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ?", username)
+    total_followers = followers[0]["COUNT(follows)"]
+    # Get the following count
+    following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
+    total_following = following[0]["COUNT(user_id)"]
+    # Get the user's list of favorites
+    favorites = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY date DESC", profile_id)
+
+    return render_template("favorites.html", path=path, users=users, profile=profile, followers=total_followers, following=total_following, favorites=favorites)
 
 
 @app.route("/follow/<username>/<int:user_id>")
@@ -120,13 +183,76 @@ def follow_user(username, user_id):
     # Insert user into DB
     if user_id and username:
         db.execute("INSERT INTO followers (user_id, follows) VALUES (?, ?)", session["user_id"], user_id)
-        return redirect("/profile/"+username)
+        return redirect("/profile-"+username)
     
-    return redirect("/")
+    return redirect("/profile-"+username)
 
-@app.route("/liked/<int:message_id>/<int:user>")
+
+@app.route("/history-<username>")
 @login_required
-def liked(message_id, user):
+def history(username):
+    path = "history-"+username
+    if not username:
+        return render_template("notfound.html")
+    # Get the session
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    # Get the profile data
+    profile = db.execute("SELECT * FROM users WHERE username = ?", username)
+    if not profile:
+        return render_template("notfound.html")
+    
+    profile_id = profile[0]["id"]
+
+    if profile_id == session["user_id"]:
+        profile[0]["session"] = True
+    else:
+        profile[0]["session"] = False
+        is_followed = db.execute("SELECT * FROM followers WHERE follows = ? AND user_id = ?", profile_id, session["user_id"])
+        if is_followed:
+            profile[0]["following"] = True
+        else:
+            profile[0]["following"] = False
+    
+    # Get the followers count
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.username = ?", username)
+    total_followers = followers[0]["COUNT(follows)"]
+    # Get the following count
+    following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
+    total_following = following[0]["COUNT(user_id)"]
+    # Get the user's last message
+    messages = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC", username)
+
+    return render_template("history.html", users=users, path=path, profile=profile, followers=total_followers, following=total_following, messages=messages)
+
+
+@app.route("/image/<username>", methods=["POST"])
+@login_required
+def image(username):
+    """Change profile's picture"""
+    if "image" not in request.files:
+        flash("No file was sent❌")
+        return redirect("/profile-"+username)
+    
+    f = request.files["image"]
+
+    if f.filename == "":
+        flash("No selected file")
+        return redirect("/profile-"+username)
+    
+    if f and allowed_file(f.filename):
+        filename = secure_filename(f.filename)
+        f.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        print(filename)
+
+    db.execute("UPDATE users SET image = ? WHERE id = ?", filename, session["user_id"])
+    
+    flash("Your profile picture has been updated! ✔️")
+    return redirect("/profile-"+username)
+
+
+@app.route("/liked/<path>/<int:message_id>/<int:user>")
+@login_required
+def liked(path, message_id, user):
     """Update the likes of a message"""
     # Check if the user already liked the message
     like = db.execute("SELECT * FROM favorites WHERE user_id = ? AND message_id = ?", session["user_id"], message_id)
@@ -141,19 +267,21 @@ def liked(message_id, user):
         db.execute("UPDATE messages SET likes = likes - 1 WHERE user_id = ? AND id = ?", user, message_id)
     
     # Refresh the page
-    return redirect("/")
+    if path == "home":
+        return redirect("/")
+    else:
+        return redirect("/"+path)
     
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
-
     # Forget any user_id
     session.clear()
 
     error = None
 
-    # User reached route via POST
+    # Route via POST
     if request.method == "POST":
         # Ensure username was submitted
         if not request.form.get("username"):
@@ -184,7 +312,7 @@ def login():
         flash('You were successfully logged in')
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
+    # Route via GET
     else:
         return render_template("login.html", error=error, page="login")
 
@@ -200,11 +328,11 @@ def logout():
     return redirect("/")
 
 
-#TODO: Route for Profile
-@app.route("/profile/<username>")
+@app.route("/profile-<username>")
 @login_required
 def profile(username):
     """Getting data for profile page"""
+    path = "profile-"+username
     if not username:
         return render_template("notfound.html")
     # Get the session
@@ -239,16 +367,12 @@ def profile(username):
     # Get the user's last message
     message = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC LIMIT 1", username)
 
-    print(favorite)
-    print(message)
-
-    return render_template("profile.html", users=users, profile=profile, followers=total_followers, following=total_following, favorite=favorite, message=message)
-    
+    return render_template("profile.html", users=users, profile=profile, followers=total_followers, following=total_following, favorite=favorite, message=message, path=path)
 
 
-@app.route("/publish", methods=["POST"])
+@app.route("/publish/<path>", methods=["POST"])
 @login_required
-def publish():
+def publish(path):
     """Publishing a new message"""
     
     # Ensure a message content is submitted
@@ -262,7 +386,10 @@ def publish():
     db.execute("INSERT INTO messages (user_id, content, date) VALUES (?,?,?)", session["user_id"], content, date)
 
     # Refresh homepage
-    return redirect("/")   
+    if path == "home":
+        return redirect("/")   
+    else:
+        return redirect("/"+path)
         
 
 @app.route("/register", methods=["GET", "POST"])
@@ -298,6 +425,7 @@ def register():
         user = request.form.get("username")
         name = request.form.get("name")
         email = request.form.get("email")
+        date = datetime.date.today()
         hash_pass = generate_password_hash(request.form.get("password"), method="scrypt", salt_length=16)
 
         # Check if the username alerady exist
@@ -312,7 +440,7 @@ def register():
             error = "This email already exist"
             return render_template("register.html", error=error)
 
-        db.execute("INSERT INTO users (username, name, pass, email) VALUES (?, ?, ?, ?)", user, name, hash_pass, email)
+        db.execute("INSERT INTO users (username, name, pass, email, joined) VALUES (?, ?, ?, ?, ?)", user, name, hash_pass, email, date)
 
         # Redirect user to the login page
         flash('You are successfully registered!')
@@ -344,8 +472,6 @@ def search():
             else:
                 user["session"] = False
 
-    print(search_list)
-    print(session["user_id"])
     return render_template("search.html", search_list=search_list, users=users)
 
 
@@ -355,5 +481,5 @@ def unfollow_user(username, user_id):
     """Stop following a user"""
     if user_id and username:
         db.execute("DELETE FROM followers WHERE user_id = ? AND follows = ?", session["user_id"], user_id)
-    
+
     return redirect("/")

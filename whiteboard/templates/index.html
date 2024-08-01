@@ -13,7 +13,7 @@
             <div class="input-group input-group-lg mb-5">
                 <span class="input-group-text" id="inputGroup-sizing-lg">
                     {% for user in users %}
-                        <img src="../static/{{ user.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                        <img src="../static/{{ user.image }}" class="rounded-circle" height="30" width="30" alt="Avatar" loading="lazy" />
                     {% endfor %}
                 </span>
                 <input id="new-message" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" placeholder="Write a new message" data-bs-toggle="modal" data-bs-target="#new-msg-modal">
@@ -29,8 +29,8 @@
                             <div class="card-body mx-3">
 
                                 <div class="d-flex align-items-center justify-content-between">
-                                    <a class="nav-link d-flex align-items-center" href="/profile/{{ msg.username }}">
-                                        <img src="../static/{{ msg.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                    <a class="nav-link d-flex align-items-center" href="/profile-{{ msg.username }}">
+                                        <img src="../static/{{ msg.image }}" class="rounded-circle" height="30" width="30" alt="Avatar" loading="lazy" />
                                         <p class="mt-3 ms-2">{{ msg.username }}</p>
                                     </a>  
                                     <h6 class="card-subtitle mt-1 text-body-secondary">{{ msg.date | format_date }}</h6>
@@ -47,13 +47,13 @@
                                                 <a href="#" class="p-2 bg-light rounded text-danger" data-bs-toggle="modal" data-bs-target="#delete-msg-modal-{{msg.id}}">delete</a>
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <a href="/liked/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
+                                                <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
                                                 <p>{{ msg.likes }}</p>
                                             </div>
                                         </div>
                                     {% else %}    
                                         <div class="d-flex justify-content-end gap-2">
-                                            <a href="/liked/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
+                                            <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
                                             <p>{{ msg.likes }}</p>
                                         </div>
                                     {% endif %}
@@ -70,7 +70,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                <form class="onsubmit-disable" action="/edit-message" method="post" onkeyenter-click="#edit-msg-btn">
+                                <form class="onsubmit-disable" action="/edit-message/{{path}}" method="post" onkeyenter-click="#edit-msg-btn">
                                     <input type="hidden" name="id" value="{{msg.id}}">
                                     <div class="mb-3">
                                         <label for="content" class="col-form-label">Message:</label>
@@ -99,7 +99,7 @@
                                 </div>
                                 <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <form class="onsubmit-disable" action="/delete-message" method="post" onkeyenter-click="#delete-msg-btn">
+                                <form class="onsubmit-disable" action="/delete-message/{{path}}" method="post" onkeyenter-click="#delete-msg-btn">
                                     <input type="hidden" name="id" value="{{msg.id}}">
                                     <button id="delete-msg-btn" type="submit" class="btn btn-danger">Delete</button>
                                 </form>
@@ -135,8 +135,8 @@
                         <ul class="navbar-nav">
                             {% for user in following %}
                                 <li class="nav-item">
-                                    <a class="nav-link d-flex align-items-center" href="/profile/{{ user.username }}">
-                                        <img src="../static/{{ user.image }}" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
+                                    <a class="nav-link d-flex align-items-center" href="/profile-{{ user.username }}">
+                                        <img src="../static/{{ user.image }}" class="rounded-circle" height="30" width="30" alt="Avatar" loading="lazy" />
                                         <p class="mt-3 ms-2">{{ user.username }}</p>
                                     </a>
                                 </li>
@@ -172,7 +172,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form class="onsubmit-disable" action="/publish" method="post" onkeyenter-click="#post-btn">
+          <form class="onsubmit-disable" action="/publish/{{path}}" method="post" onkeyenter-click="#post-btn">
             <div class="mb-3">
               <label for="content" class="col-form-label">Message:</label>
               <textarea class="form-control" name="content"></textarea>
