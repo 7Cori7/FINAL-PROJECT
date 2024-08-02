@@ -1,247 +1,178 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- http://getbootstrap.com/docs/5.3/ -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <link rel="stylesheet" href="../static/styles.css">
-    <link rel="icon" href="../static/pen.svg" type="image/svg">
+{% extends "layout.html" %}
 
-    <!--boxicons-->
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-    
-    <title>WhiteBoard - Settings</title>
-</head>
-<body class="bg-light">
+{% block title %}
+    settings
+{% endblock %}
 
-    <!-- Navbar -->
-    <nav class="bg-light navbar navbar-expand-md navbar-light sticky-top">
-
-        <div class="container-fluid">
-
-            <!--Logo-->
-            <a class="navbar-brand" href="index.html">
-                <img src="../static/whiteboard-logo.svg" alt="WhiteBoard logo" width="200" loading="lazy">
-            </a>
-
-            <!--Toggle menu btn-->
-            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!--Navbar content-->
-            <div class="collapse navbar-collapse" id="navbar">
-
-                <!--if user is logged-->
-                <div class="container mt-2 d-md-none d-xl-block"></div>
-
-                <div class="container-lg mt-2">
-                    <form class="d-flex align-items-center" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="search-btn" type="submit">
-                            <box-icon name='search'></box-icon>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="container mt-2 d-md-none d-xl-block"></div>
-
-                <ul class="navbar-nav ms-auto mt-2 d-md-flex align-items-md-center">
-
-                    <li class="nav-item dropdown me-1">
-                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                            <box-icon name='heart'></box-icon>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                              <a class="dropdown-item" href="#">Element 1</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="#">Element 2</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="#">Element 3</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item dropdown me-lg-5">
-
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                            <img src="../static/avatar.jpg" class="rounded-circle" height="30" alt="Avatar" loading="lazy" />
-                            <p class="mt-3 ms-2">Username</p>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                              <a class="dropdown-item" href="profile.html">My profile</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="settings.html">Settings</a>
-                            </li>
-                            <li>
-                              <a class="dropdown-item" href="login.html">Logout</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <!--if user is not logged-->
-                <!-- <ul class="navbar-nav ms-auto mt-2">
-
-                    <li class="nav-item me-md-2 mt-md-0 mt-sm-5">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/login">Log In</a>
-                        </button>
-                    </li>
-
-                    <li class="nav-item me-md-5 mt-md-0 mt-sm-2">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <a class="nav-link" href="/login">Register</a>
-                        </button>
-                    </li>
-                </ul> -->
-            </div>
-
-        </div>
-        
-    </nav>
-
-    <!--Profile abstract-->
+<!--Header-->
+{% block header %}
     <header class="container-fluid pt-5 mt-3 px-5 border">
 
         <div id="profile-header" class="d-md-flex justify-content-between">
             <div class="d-lg-flex align-items-center justify-content-center gap-3">
-                <img src="../static/avatar.jpg" class="rounded-circle" height="150" alt="Avatar" loading="lazy" />
-                <div>
-                    <a href="profile.html">
-                        <h3 class="text-dark">Username</h3>
-                        <h6 class="text-dark">Name Lastname</h6>
-                    </a>
-                    <p>Joined on Jul 28 2024</p>
+                {% for row in users %}
+                  <a href="#" type="button" data-bs-toggle="modal" data-bs-target="#modal-image">
+                      <img src="../static/{{row.image}}" class="rounded-circle" height="150" width="150" alt="Avatar" loading="lazy" />
+                  </a>
+                <!--Modal for changing the avatar-->
+                <div class="modal fade" id="modal-image" tabindex="-1" aria-labelledby="image-Label" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="image-Label">change Profile Picture</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                        {% for row in users %}
+                            <div class="d-flex justify-content-center align-items-center">
+                                <img src="../static/{{row.image}}" alt="profile picture" width="200" height="200" loading="lazy">
+                            </div>
+                            <form class="onsubmit-disable" action="/image/{{ row.username }}" method="post" onkeyenter-click="#change-img-btn" enctype="multipart/form-data">
+                                
+                                <div class="mb-3">
+                                    <label for="image" class="col-form-label">Select a photo</label>
+                                    <input type="file" class="form-control" name="image" accept="image/png, image/jpg">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                                    <button id="change-img-btn" type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        {% endfor %}
+                        </div>
+                    </div>
+                    </div>
                 </div>
+                  <div>
+                      <a href="/profile-{{ row.username }}">
+                          <h3 class="text-dark">{{ row.username }}</h3>
+                          <h6 class="text-dark">{{ row.name }}</h6>
+                      </a>
+                      <p>Joined on {{ row.joined | format_date }}</p>
+                  </div>
+                {% endfor %}
             </div>
             <div>
-                <button type="button" class="btn btn-primary btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#modal-edit-profile">
+                {% for row in users %}
+                  <button type="button" class="btn btn-primary btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#modal-edit-profile">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1);"><path d="M8.707 19.707 18 10.414 13.586 6l-9.293 9.293a1.003 1.003 0 0 0-.263.464L3 21l5.242-1.03c.176-.044.337-.135.465-.263zM21 7.414a2 2 0 0 0 0-2.828L19.414 3a2 2 0 0 0-2.828 0L15 4.586 19.414 9 21 7.414z"></path></svg>
                     Edit
-                </button>
+                  </button>
+
+                  <!--Modal for editing profile-->
+                  <div class="modal fade modal-lg" id="modal-edit-profile" tabindex="-1" aria-labelledby="edit-profile-Label" aria-hidden="true">
+                      <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="edit-profile-Label">Edit Profile</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                          {% for row in users %}
+                              <form class="onsubmit-disable" action="/edit-profile/{{ row.username }}" method="post" onkeyenter-click="#edit-profile-btn">
+                                  
+                                  <div class="mb-3">
+                                      <label for="workplace" class="col-form-label">Workplace:</label>
+                                      <input type="text" class="form-control" name="workplace" placeholder="Your workplace" value="{{ row.workplace }}">
+                                      </div>
+                                      <div class="mb-3">
+                                      <label for="location" class="col-form-label">Where you live:</label>
+                                      <input type="text" class="form-control" name="location" placeholder="Enter your location" value="{{ row.location }}">
+                                      </div>
+                                      <div class="mb-3">
+                                      <label for="studies" class="col-form-label">Education:</label>
+                                      <input type="text" class="form-control" name="studies" placeholder="Your studies" value="{{ row.studies }}">
+                                      </div>
+                                      <div class="mb-3">
+                                      <label for="phone" class="col-form-label">Phone:</label>
+                                      <input type="tel" class="form-control" name="phone" placeholder="Your phone number" value="{{ row.phone }}">
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                                      <button id="edit-profile-btn" type="submit" class="btn btn-primary">Save changes</button>
+                                  </div>
+                              </form>
+                          {% endfor %}
+                          </div>
+                      </div>
+                      </div>
+                  </div>
+                {% endfor %}
             </div>
         </div>
         <div id="profile-header_followers-container" class="d-flex gap-5 mt-3">
             <div class="container d-none d-md-block"></div>
             <div class="d-flex align-items-baseline gap-2">
-                <p>500</p>
+                <p>{{ followers }}</p>
                 <h5>Followers</h5>
             </div>
             <div class="d-flex align-items-baseline gap-2">
-                <p>50</p>
+                <p>{{ following }}</p>
                 <h5>Following</h5>
             </div>
         </div>
     </header>
+{% endblock %}
 
-    <main class="container py-5">
-
-        <div class="container">
-
-            <div class="card mb-5">
-
-                <div class="card-body mx-3 row">
-
-                    <form>
-                        <div class="mb-3">
-                          <label for="exampleInputEmail1" class="form-label">New Username</label>
-                          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter new username">
-                          <div id="emailHelp" class="form-text">Username must be unique.</div>
-                        </div>
-                        <div class="mb-3">
-                          <label for="exampleInputPassword1" class="form-label">New Password</label>
-                          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Enter new password">
-                        </div>
-                        <div class="mb-3">
-                          <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Match new password">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </form>
-                </div>
+{% block main %}
+  <div class="container">
+    <div class="card mb-5">
+        <div class="card-body mx-3 row">
+          <form class="border-bottom mb-3" action="/settings/username" method="post">
+            <div class="mb-3">
+              <label for="username" class="form-label">New Username</label>
+              <input type="text" class="form-control me-2" name="username" aria-describedby="usernameHelp" placeholder="Enter new username" autocomplete="off">
+              <div id="usernameHelp" class="form-text">Username must be unique.</div>
+              <button type="submit" class="btn btn-primary">Change username</button>
             </div>
-            <div class="alert alert-danger" role="alert">
-                <p class="h6 mb-3 text-uppercase">Danger zone!</p>
-                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete profile</button>
-            </div>
-        </div>
+          </form>
 
-    </main>
-
-    <!--Modal for editing profile-->
-    <div class="modal fade modal-lg" id="modal-edit-profile" tabindex="-1" aria-labelledby="edit-profile-Label" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="edit-profile-Label">Edit Profile</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="mb-3">
-                  <label for="workplace" class="col-form-label">Workplace:</label>
-                  <input type="text" class="form-control" id="workplace" placeholder="Your workplace">
-                </div>
-                <div class="mb-3">
-                  <label for="location" class="col-form-label">Where you live:</label>
-                  <input type="text" class="form-control" id="location" placeholder="Enter your location">
-                </div>
-                <div class="mb-3">
-                  <label for="studies" class="col-form-label">Studies:</label>
-                  <input type="text" class="form-control" id="studies" placeholder="Your studies">
-                </div>
-                <div class="mb-3">
-                  <label for="phone" class="col-form-label">Phone:</label>
-                  <input type="tel" class="form-control" id="phone" placeholder="Your phone number">
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
+          <form action="/settings" method="post">
+              <div class="mb-3">
+                <label for="password" class="form-label">New Password</label>
+                <input type="password" class="form-control" name="password" placeholder="Enter new password">
+              </div>
+              <div class="mb-3">
+                <input type="password" class="form-control" name="confirmation" placeholder="Match new password">
+              </div>
+              <button type="submit" class="btn btn-primary">Change password</button>
+          </form>
         </div>
     </div>
-
-    <!--Modal to Delete profile-->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Profile</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <p>Are you sure you wanna delete your profile? This action is irremediable.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <form>
-                <input type="hidden">
-                <button type="submit" class="btn btn-danger">Delete</button>
-              </form>
-            </div>
-          </div>
-        </div>
+    <div class="alert alert-danger" role="alert">
+        <p class="h6 mb-3 text-uppercase">Danger zone!</p>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete profile</button>
     </div>
+  </div>
+  <!--Modal to Delete profile-->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deletemodalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="deletemodalLabel">Delete Profile</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you wanna delete your profile? This action is irremediable.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <form action="/delete" method="post">
+            <input type="hidden" name="delete" value="{{users[0].id}}">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
 
-    <!--Footer-->
+
+{% block footer %}
     <footer class="mb-5">
         <p class="mb-3 small text-center text-muted">
             Corina IDL <span id="date"></span> All Rights Reserved
         </p>
         <script> document.querySelector('#date').innerHTML = new Date().getFullYear(); </script>
     </footer>
-</body>
-</html>
+{% endblock %}

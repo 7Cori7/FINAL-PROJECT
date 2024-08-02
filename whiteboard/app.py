@@ -59,6 +59,40 @@ def index():
     return render_template("index.html", users=users, messages=messages, following=following, path=path)
 
 
+@app.route("/delete", methods=["POST"])
+@login_required
+def delete():
+    """Delete profile"""
+    if not request.form.get("delete"):
+        flash("An error has occurred 😵")
+        return redirect("/settings")
+    
+    id = request.form.get("delete")
+
+    if not int(id) == session["user_id"]:
+        flash("An error has occurred 😵")
+        return redirect("/settings")
+    
+    # delete user from followers
+    db.execute("DELETE FROM followers WHERE user_id = ?", session["user_id"])
+    db.execute("DELETE FROM followers WHERE follows = ?",  session["user_id"])
+    # delete user's messages that were liked by others if there are any
+    messages = db.execute("SELECT * FROM messages WHERE user_id = ?", session["user_id"])
+    if messages:
+        for row in messages:
+            db.execute("DELETE FROM favorites WHERE message_id = ?", row["id"])
+    # delete from favorites 
+    db.execute("DELETE FROM favorites WHERE user_id = ?", session["user_id"])       
+    # delete from messages
+    db.execute("DELETE FROM messages WHERE user_id = ?", session["user_id"])
+    # delete from users
+    db.execute("DELETE FROM users WHERE id = ?", session["user_id"])
+    # clear session
+    session.clear()
+
+    return redirect("/")
+
+
 @app.route("/delete-message/<path>", methods=["POST"])
 @login_required
 def delete_message(path):
@@ -563,6 +597,56 @@ def search():
                 user["session"] = False
 
     return render_template("search.html", search_list=search_list, users=users)
+
+
+@app.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+    """Edit settings for user profile"""
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    if request.method == "POST":
+        # Ensure password was submitted
+        if not request.form.get("password") or not request.form.get("confirmation"):
+            flash("You must provide password ❌")
+            return redirect("/settings")
+        # Ensure the passwords submitted are the same
+        if not request.form.get("password") == request.form.get("confirmation"):
+            flash("Passwords must match ❌")
+            return redirect("/settings")
+        
+        hash_pass = generate_password_hash(request.form.get("password"), method="scrypt", salt_length=16)
+        db.execute("UPDATE users SET pass = ? WHERE id = ?", hash_pass, session["user_id"])
+
+        flash("Your password has been sucessfully updated! ✔️")
+        return redirect("/")
+    # Get the followers count
+    followers = db.execute("SELECT COUNT(follows) FROM followers JOIN users ON followers.follows = users.id WHERE users.id = ? AND followers.user_id != ?", session["user_id"], session["user_id"])
+    total_followers = followers[0]["COUNT(follows)"]
+    # Get the following count
+    following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.id = ? AND followers.follows != ?", session["user_id"], session["user_id"])
+    total_following = following[0]["COUNT(user_id)"] 
+
+    return render_template("settings.html", users=users, followers=total_followers, following=total_following)
+
+
+@app.route("/settings/username", methods=["POST"])
+@login_required
+def change_username():
+    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    if not request.form.get("username ❌"):
+        flash("Invalid username")
+        return redirect("/settings")
+    
+    username = request.form.get("username")
+    check = db.execute("SELECT * FROM users WHERE username = ?", username)
+
+    if check:
+        flash("The username already exists ❌")
+        return redirect("/settings")
+    
+    db.execute("UPDATE users SET username = ? WHERE users.id = ?", username, session["user_id"])
+    flash("Your username has been sucessfully updated! ✔️")
+    return redirect("/")
 
 
 @app.route("/unfollow/<username>/<int:user_id>")
