@@ -129,7 +129,7 @@
     <div class="container-fluid pb-5 mt-4 px-5 d-flex justify-content-lg-around justify-content-center flex-wrap gap-3">
         {% for row in profile %}
             {% if row.session %}
-                <a href="/favorites-{{row.username}}" class="d-flex text-secondary profile-link">
+                <a href="/favorites-{{row.username}}" class="d-flex text-secondary profile-link link-active">
                     <box-icon name='heart' color="#6c757d"></box-icon>
                     <h5>Favorites</h5>
                 </a>
@@ -179,7 +179,7 @@
                                     </div>
                                     <p class="card-text">{{ row.content }}</p>
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a href="/liked/{{path}}/{{row.message_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                        <a href="/liked/{{path}}/{{row.message_id}}/{{row.id}}"><box-icon type='solid' name='heart' color='#6b6b6b'></box-icon></a>
                                         <p>{{ row.likes }}</p>
                                     </div>
                                 </div>

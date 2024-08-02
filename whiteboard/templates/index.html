@@ -47,13 +47,21 @@
                                                 <a href="#" class="p-2 bg-light rounded text-danger" data-bs-toggle="modal" data-bs-target="#delete-msg-modal-{{msg.id}}">delete</a>
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
+                                                {% if msg.liked %}
+                                                    <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>
+                                                {% else %}
+                                                    <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
+                                                {% endif %}                      
                                                 <p>{{ msg.likes }}</p>
                                             </div>
                                         </div>
                                     {% else %}    
                                         <div class="d-flex justify-content-end gap-2">
-                                            <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
+                                            {% if msg.liked %}
+                                                    <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>
+                                                {% else %}
+                                                    <a href="/liked/{{ path }}/{{msg.id}}/{{msg.user_id}}"><box-icon name='heart'></box-icon></a>
+                                                {% endif %} 
                                             <p>{{ msg.likes }}</p>
                                         </div>
                                     {% endif %}

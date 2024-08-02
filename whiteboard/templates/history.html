@@ -133,7 +133,7 @@
                     <box-icon name='heart' color="#6c757d"></box-icon>
                     <h5>Favorites</h5>
                 </a>
-                <a href="/history-{{row.username}}" class="d-flex text-secondary profile-link">
+                <a href="/history-{{row.username}}" class="d-flex text-secondary profile-link link-active">
                     <box-icon name='notepad' color="#6c757d"></box-icon>
                     <h5>History</h5>
                 </a>
@@ -178,6 +178,7 @@
                                         <h6 class="card-subtitle mt-1 text-body-secondary">{{ row.date | format_date }}</h6>
                                     </div>
                                     <p class="card-text">{{ row.content }}</p>
+
                                     {% for user in profile %}
                                         {% if user.session %}
                                             <div class="d-flex justify-content-between gap-2">
@@ -187,7 +188,11 @@
                                                     <a href="#" class="p-2 bg-light rounded text-danger" data-bs-toggle="modal" data-bs-target="#delete-msg-modal-{{row.msg_id}}">delete</a>
                                                 </div>
                                                 <div class="d-flex gap-2">
-                                                    <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                    {% if row.liked %}
+                                                        <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>
+                                                    {% else %}
+                                                        <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                    {% endif%}
                                                     <p>{{ row.likes }}</p>
                                                 </div>
                                             </div>
@@ -241,7 +246,11 @@
                                         {% else %}
                                             <div class="d-flex justify-content-end">
                                                 <div class="d-flex gap-2">
-                                                    <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                    {% if row.liked %}
+                                                        <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>
+                                                    {% else %}
+                                                        <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                    {% endif %}
                                                     <p>{{ row.likes }}</p>
                                                 </div>
                                             </div>
@@ -253,7 +262,7 @@
                     {% else %}
                         <div class="card mb-5">
                             <div class="card-body mx-3 text-center text-muted">
-                                <h5>No favorites to show.</h5>
+                                <h5>No messages to show.</h5>
                             </div>
                         </div>
                     {% endif %}

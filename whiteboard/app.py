@@ -52,6 +52,13 @@ def index():
 
     # Get all the messages from the people the user is following
     messages = db.execute("SELECT username, image, content, likes, date, messages.id, messages.user_id FROM users, messages, followers WHERE users.id = messages.user_id AND messages.user_id = followers.follows AND followers.user_id = ? ORDER BY date DESC", session["user_id"])
+    # Get messages liked by the user
+    for row in messages:
+        is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", row["id"], session["user_id"])
+        if is_liked:
+            row["liked"] = True
+        else:
+            row["liked"] = False
 
     # Get 5 people the user is following
     following = db.execute("SELECT username, image FROM users, followers WHERE users.id = followers.follows AND followers.user_id = ? AND followers.follows != ? LIMIT 5", session["user_id"], session["user_id"])
@@ -172,6 +179,7 @@ def edit_profile(username):
 @app.route("/favorites-<username>")
 @login_required
 def favorites(username):
+    """Show all favorited messages in the favorites page"""
     path = "favorites-"+username
     if not username:
         return render_template("notfound.html")
@@ -201,7 +209,7 @@ def favorites(username):
     following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
     total_following = following[0]["COUNT(user_id)"]
     # Get the user's list of favorites
-    favorites = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY date DESC", profile_id)
+    favorites = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY stamp DESC", profile_id)
 
     return render_template("favorites.html", path=path, users=users, profile=profile, followers=total_followers, following=total_following, favorites=favorites)
 
@@ -234,7 +242,7 @@ def follow_user(username, user_id):
 @app.route("/followers-<username>")
 @login_required
 def followers(username):
-    """Print all followers"""
+    """Print all followers in the followers page"""
     if not username:
         return render_template("notfound.html")
     # Get the session
@@ -254,8 +262,7 @@ def followers(username):
 @app.route("/following-<username>")
 @login_required
 def following(username):
-    """Print all following"""
-    """Print all followers"""
+    """Print all users in the following page"""
     if not username:
         return render_template("notfound.html")
     # Get the session
@@ -275,6 +282,7 @@ def following(username):
 @app.route("/history-<username>")
 @login_required
 def history(username):
+    """Show all messages made by the user in the history page"""
     path = "history-"+username
     if not username:
         return render_template("notfound.html")
@@ -303,15 +311,23 @@ def history(username):
     # Get the following count
     following = db.execute("SELECT COUNT(user_id) FROM followers JOIN users ON followers.user_id = users.id WHERE users.username = ? AND followers.follows != ?", username, profile_id)
     total_following = following[0]["COUNT(user_id)"]
-    # Get the user's last message
+    # Get the user's messages
     messages = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC", username)
-
+    # Get messages liked by the user
+    for row in messages:
+        is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", row["msg_id"], session["user_id"])
+        if is_liked:
+            row["liked"] = True
+        else:
+            row["liked"] = False
+                                      
     return render_template("history.html", users=users, path=path, profile=profile, followers=total_followers, following=total_following, messages=messages)
 
 
 @app.route("/info-<username>")
 @login_required
 def info(username):
+    """Show the profile information in the info page"""
     path = "info-"+username
     if not username:
         return render_template("notfound.html")
@@ -380,11 +396,12 @@ def liked(path, message_id, user):
     """Update the likes of a message"""
     # Check if the user already liked the message
     like = db.execute("SELECT * FROM favorites WHERE user_id = ? AND message_id = ?", session["user_id"], message_id)
-
+    now = datetime.datetime.now()
+    timpeStamp = datetime.datetime.timestamp(now)
     # Actions to take accordingly
     if not like:
         db.execute("UPDATE messages SET likes = likes + 1 WHERE user_id = ? AND id = ?", user, message_id)
-        db.execute("INSERT INTO favorites (user_id, message_id) VALUES (?, ?)", session["user_id"], message_id)
+        db.execute("INSERT INTO favorites (user_id, message_id, stamp) VALUES (?, ?, ?)", session["user_id"], message_id, timpeStamp)
     
     else:
         db.execute("DELETE FROM favorites WHERE user_id = ? AND message_id = ?", session["user_id"], message_id)
@@ -487,9 +504,17 @@ def profile(username):
     for item in following:
         total_following = item["COUNT(user_id)"]
     # Get the user's last favorite
-    favorite = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY date DESC LIMIT 1", profile_id)
+    favorite = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY stamp DESC LIMIT 1", profile_id)
+    favorite[0]["liked"] = True
     # Get the user's last message
     message = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC LIMIT 1", username)
+    # Get messages liked by the user
+    for row in message:
+        is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", row["msg_id"], session["user_id"])
+        if is_liked:
+            row["liked"] = True
+        else:
+            row["liked"] = False
 
     return render_template("profile.html", users=users, profile=profile, followers=total_followers, following=total_following, favorite=favorite, message=message, path=path)
 
@@ -497,8 +522,7 @@ def profile(username):
 @app.route("/publish/<path>", methods=["POST"])
 @login_required
 def publish(path):
-    """Publishing a new message"""
-    
+    """Posting a new message"""
     # Ensure a message content is submitted
     if not request.form.get("content"):
         return
@@ -575,27 +599,28 @@ def register():
 
 @app.route("/search")
 def search():
-    """Search for users"""
+    """Search for users and show them in the search page"""
     users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"]) 
     if not request.args.get("user"):
         flash("Enter a name to search")
         return redirect("/")
     search = request.args.get("user")
     search_list = db.execute("SELECT image, username, id FROM users WHERE username LIKE ? OR name LIKE ?", '%'+search+'%', '%'+search+'%')
-    following_list = db.execute("SELECT * FROM followers WHERE user_id = ?", session["user_id"])
 
+    # Check if the results of search have users being followed or if it's the session user
     for user in search_list:
-        for row in following_list:
-            if user["id"] == row["follows"]:
-                user["following"] = True
-            else:
-                user["following"] = False
-            
-            if row["follows"] == session["user_id"]:
-                user["session"] = True
-            else:
-                user["session"] = False
-
+        is_followed = db.execute("SELECT * FROM followers WHERE user_id = ? AND follows = ?", session["user_id"], user["id"])
+        if is_followed:
+            user["following"] = True
+        else:
+            user["following"] = False
+        
+    for row in is_followed:
+        if row["follows"] == session["user_id"]:
+            user["session"] = True
+        else:
+            user["session"] = False
+    
     return render_template("search.html", search_list=search_list, users=users)
 
 
@@ -632,7 +657,7 @@ def settings():
 @app.route("/settings/username", methods=["POST"])
 @login_required
 def change_username():
-    users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    """Change the username"""
     if not request.form.get("username ❌"):
         flash("Invalid username")
         return redirect("/settings")

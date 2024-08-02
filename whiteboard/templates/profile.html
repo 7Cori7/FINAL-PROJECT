@@ -201,8 +201,8 @@
                                 </div>
 
                                 <p class="card-text">{{ row.content }}</p>
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="/liked/{{path}}/{{row.message_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                <div class="d-flex justify-content-end gap-2">                                 
+                                    <a href="/liked/{{path}}/{{row.message_id}}/{{row.id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>                              
                                     <p>{{ row.likes }}</p>
                                 </div>
                             {% endfor %}
@@ -241,7 +241,11 @@
                                                 <a href="#" class="p-2 bg-light rounded text-danger" data-bs-toggle="modal" data-bs-target="#delete-msg-modal-{{row.msg_id}}">delete</a>
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                {% if row.liked %}
+                                                    <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>
+                                                {% else %}
+                                                    <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                {% endif %}                                           
                                                 <p>{{ row.likes }}</p>
                                             </div>
                                         </div>
@@ -295,7 +299,11 @@
                                     {% else %}
                                         <div class="d-flex justify-content-end">
                                             <div class="d-flex gap-2">
-                                                <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                {% if row.liked %}
+                                                    <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart' type='solid' color='#6b6b6b'></box-icon></a>
+                                                {% else %}
+                                                    <a href="/liked/{{path}}/{{row.msg_id}}/{{row.id}}"><box-icon name='heart'></box-icon></a>
+                                                {% endif %} 
                                                 <p>{{ row.likes }}</p>
                                             </div>
                                         </div>
