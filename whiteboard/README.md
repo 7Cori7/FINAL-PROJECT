@@ -7,7 +7,7 @@ It consist in creating a user, log into the platform, and then you can search fo
 follow them. You can also write and post any message you like, also you can see any message from your
 friends in your feed, and of course you can like any message and save it in your "favorites".
 
-You can personalize your profile uploading an avatar picture, you can also edit some other info of yourself
+You can personalize your profile, by uploading an avatar picture, you can also edit some other info of yourself
 if you like, and ofcourse you can visit any othe user's profile.
 
 
@@ -20,26 +20,34 @@ if you like, and ofcourse you can visit any othe user's profile.
 - Info page
 - Login page
 - Register page
+- Search page
 - Settings page
 
 
-## Uses:
+## Usage:
 
 In this web-app the user can write messages with a max of 150 characters and post them into the feed that
 would be the home page.
 
-Every logged user can see every message posted by any other user in the feed page, and can interact with
-said messages marking them as favorites.
+Every logged user can see every message posted by any other user they're currently following on the feed page, and can interact with said messages marking them as favorites.
 
-Every message marked as favorite will be saved and posted in the favorite's page of each user. The number
+Every message marked as favorite will be saved and posted in the favorite's page of the user in session. The number
 of favorites will be shown in the message card. The user can then unfavorite the message if they want.
 
 The user can see every message posted by them in the history page. Then they can edit or delete any of their own
-messages.
+messages too.
 
-In the profile page some info of the user will be displayed, like their user name, date they joined, how many
-messages have beem posted by them, how many favorites, also the last messaged posted by them as well as the
-last message favorited by them.
+In the profile page some info of the user will be displayed, like their user name, the date they joined, their avatar picture, how many users follow them and how many they follow. Also you'll see the last message they liked, as well as the last messaged posted by them. The user in session can visit any user's profile and interact with them, liking their messages or following/unfollowing them.
+
+In the favorites page, you'll see a list of all the messages liked by user. This page isn't accessible if the user visit other user's profile.
+
+In the history page, you can see all messages posted by the user. The user can edit or delet any of their own messages anywhere they are shown on screen.
+
+In the info page, you can see some extra info the user might provide, as well as a list of all users following or boing followed by them.
+
+In the search page, you can see a list of any matching existing users corresponding your prompt in the search bar.
+
+In the setting page, the user can decide to edit some curcial info of their account, like, their username, or their password. They also can decide to delete their account for good!
 
 
 ### Technology used:
@@ -55,3 +63,6 @@ For back-end:
 - Flask
 - Jinja templates
 - Python
+
+
+Thank you very much, I'm Corina IDL and this is CS50.

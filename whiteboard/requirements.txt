@@ -1,1 +1,18 @@
-Requirements for this app:
+## Requirements for this app
+
+### app.py
+
+cs50
+datetime
+flask
+flask_session
+pytz
+werkzeug.security
+werkzeug.utils
+
+
+### helpers.py
+
+datetime
+flask
+functools
