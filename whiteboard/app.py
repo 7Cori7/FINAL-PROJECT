@@ -505,16 +505,18 @@ def profile(username):
         total_following = item["COUNT(user_id)"]
     # Get the user's last favorite
     favorite = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY stamp DESC LIMIT 1", profile_id)
-    favorite[0]["liked"] = True
+    if favorite:
+        favorite[0]["liked"] = True
     # Get the user's last message
     message = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC LIMIT 1", username)
-    # Get messages liked by the user
-    for row in message:
-        is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", row["msg_id"], session["user_id"])
-        if is_liked:
-            row["liked"] = True
-        else:
-            row["liked"] = False
+    if message:
+        # Get messages liked by the user
+        for row in message:
+            is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", row["msg_id"], session["user_id"])
+            if is_liked:
+                row["liked"] = True
+            else:
+                row["liked"] = False
 
     return render_template("profile.html", users=users, profile=profile, followers=total_followers, following=total_following, favorite=favorite, message=message, path=path)
 
@@ -611,15 +613,16 @@ def search():
     for user in search_list:
         is_followed = db.execute("SELECT * FROM followers WHERE user_id = ? AND follows = ?", session["user_id"], user["id"])
         if is_followed:
+
             user["following"] = True
+            
+            for row in is_followed:
+                if row["follows"] == session["user_id"]:
+                    user["session"] = True
+                else:
+                    user["session"] = False
         else:
             user["following"] = False
-        
-    for row in is_followed:
-        if row["follows"] == session["user_id"]:
-            user["session"] = True
-        else:
-            user["session"] = False
     
     return render_template("search.html", search_list=search_list, users=users)
 
