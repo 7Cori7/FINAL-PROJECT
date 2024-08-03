@@ -527,12 +527,23 @@ def publish(path):
     """Posting a new message"""
     # Ensure a message content is submitted
     if not request.form.get("content"):
-        return
+        flash("Your message was empty")
+        if path == "home":
+            return redirect("/")   
+        else:
+            return redirect("/"+path)
     # Get the data
     content = request.form.get("content")
+    if len(content) > 150:
+        flash("The message is too long")
+        if path == "home":
+            return redirect("/")   
+        else:
+            return redirect("/"+path)
+    
     date = datetime.datetime.now(pytz.timezone("US/Eastern"))
 
-    # Insert in db
+    # Insert into db
     db.execute("INSERT INTO messages (user_id, content, date) VALUES (?,?,?)", session["user_id"], content, date)
 
     # Refresh homepage
