@@ -1,4 +1,9 @@
-# Social Media App
+# WhiteBoard
+
+### Video demo: https://youtu.be/U7KiW_G3DwA?si=iTXw8-9sUtsbreAV
+
+
+### Description:
 
 My final project for the CS50 course is a very simple social media app, that can be a bit similar to
 Twitter.
@@ -61,8 +66,9 @@ For front-end:
 
 For back-end:
 - Flask
-- Jinja templates
+- Jinja
 - Python
+- SQLite
 
 
 Thank you very much, I'm Corina IDL and this is CS50.
