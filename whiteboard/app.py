@@ -185,6 +185,8 @@ def favorites(username):
         return render_template("notfound.html")
     # Get the session
     users = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+    if not username == users[0]["username"]:
+        return redirect("/")
     # Get the profile data
     profile = db.execute("SELECT * FROM users WHERE username = ?", username)
     if not profile:
@@ -505,19 +507,24 @@ def profile(username):
         total_following = item["COUNT(user_id)"]
     # Get the user's last favorite
     favorite = db.execute("SELECT message_id, username, image, users.id AS id, content, likes, date FROM favorites, users, messages WHERE favorites.message_id = messages.id AND messages.user_id = users.id AND favorites.user_id = ? ORDER BY stamp DESC LIMIT 1", profile_id)
+    # In case of session user visiting other user's profile, check if favorite is in session user favorites too
     if favorite:
-        favorite[0]["liked"] = True
+        likes = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", favorite[0]["message_id"], session["user_id"])
+        if likes:
+            favorite[0]["liked"] = True
+        else:
+            favorite[0]["liked"] = False
+                
     # Get the user's last message
     message = db.execute("SELECT users.id AS id, username, image, content, likes, date, messages.id AS msg_id FROM users JOIN messages ON users.id = messages.user_id WHERE users.username = ? ORDER BY messages.date DESC LIMIT 1", username)
     if message:
         # Get messages liked by the user
-        for row in message:
-            is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", row["msg_id"], session["user_id"])
-            if is_liked:
-                row["liked"] = True
-            else:
-                row["liked"] = False
-
+        is_liked = db.execute("SELECT * FROM favorites WHERE message_id = ? AND user_id = ?", message[0]["msg_id"], session["user_id"])
+        if is_liked:
+            message[0]["liked"] = True
+        else:
+            message[0]["liked"] = False
+            
     return render_template("profile.html", users=users, profile=profile, followers=total_followers, following=total_following, favorite=favorite, message=message, path=path)
 
 
