@@ -34,21 +34,21 @@ if you like, and ofcourse you can visit any othe user's profile.
 In this web-app the user can write messages with a max of 150 characters and post them into the feed that
 would be the home page.
 
-Every logged user can see every message posted by any other user they're currently following on the feed page, and can interact with said messages marking them as favorites.
+Every logged user can see every message posted by any other user they're currently following on the home page, and can interact with said messages marking/un-marking them as favorites.
 
 Every message marked as favorite will be saved and posted in the favorite's page of the user in session. The number
-of favorites will be shown in the message card. The user can then unfavorite the message if they want.
+of favorites will be shown in the message card. The user can then un-favorite the message if they want.
 
-The user can see every message posted by them in the history page. Then they can edit or delete any of their own
+The user can see every message posted by themselves in the history page. Then they can edit or delete any of their own
 messages too.
 
 In the profile page some info of the user will be displayed, like their user name, the date they joined, their avatar picture, how many users follow them and how many they follow. Also you'll see the last message they liked, as well as the last messaged posted by them. The user in session can visit any user's profile and interact with them, liking their messages or following/unfollowing them.
 
 In the favorites page, you'll see a list of all the messages liked by user. This page isn't accessible if the user visit other user's profile.
 
-In the history page, you can see all messages posted by the user. The user can edit or delet any of their own messages anywhere they are shown on screen.
+In the history page, you can see all messages posted by the user. The user can edit or delete any of their own messages anywhere they are shown on screen.
 
-In the info page, you can see some extra info the user might provide, as well as a list of all users following or boing followed by them.
+In the info page, you can see some extra info the user might provide, as well as a list of all users following or being followed by them.
 
 In the search page, you can see a list of any matching existing users corresponding your prompt in the search bar.
 
